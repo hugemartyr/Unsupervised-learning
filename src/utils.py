@@ -2,12 +2,10 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
-from sklearn.metrics import normalized_mutual_info_score
+from sklearn.metrics import normalized_mutual_info_score, silhouette_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import silhouette_score
 import plotly.express as px
 from kmeans import KMeans
-
 
 
 def load_iris_data():
@@ -17,8 +15,10 @@ def load_iris_data():
     feature_names = iris.feature_names
     return X, y, feature_names
 
+
 def compute_nmi(true_labels, predicted_labels):
     return normalized_mutual_info_score(true_labels, predicted_labels)
+
 
 def plot_clusters(X, y_pred, centroids, filename, plot_type='scatter'):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -39,7 +39,6 @@ def plot_clusters(X, y_pred, centroids, filename, plot_type='scatter'):
         plt.title('K-Means Clustering (Scatter)')
     
     elif plot_type == 'line':
-        # Plot points connected by line within each cluster (for demonstration)
         for cluster in set(y_pred):
             plt.plot(
                 X[y_pred == cluster, 0], 
@@ -53,7 +52,6 @@ def plot_clusters(X, y_pred, centroids, filename, plot_type='scatter'):
         plt.title('K-Means Clustering (Line)')
     
     elif plot_type == 'centroid_only':
-        # Just show centroids
         plt.scatter(
             centroids[:, 0], centroids[:, 1], 
             s=300, c='black', marker='X', label='Centroids'
@@ -69,16 +67,18 @@ def plot_clusters(X, y_pred, centroids, filename, plot_type='scatter'):
     plt.savefig(filename)
     plt.close()
 
-    def preprocess_data(X):
-    # Handle missing values (simple strategy: fill with column mean)
+
+def preprocess_data(X):
+    # Handle missing values (fill with column mean)
     X = pd.DataFrame(X)
     X = X.fillna(X.mean())
     
-    # Feature scaling (StandardScaler)
+    # Feature scaling
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     
     return X_scaled
+
 
 def plot_elbow_silhouette(X, max_k=10, filename_elbow='../results/plots/elbow.png', filename_silhouette='../results/plots/silhouette.png'):
     inertia = []
@@ -112,10 +112,12 @@ def plot_elbow_silhouette(X, max_k=10, filename_elbow='../results/plots/elbow.pn
     print(f"Elbow plot saved to {filename_elbow}")
     print(f"Silhouette plot saved to {filename_silhouette}")
 
+
 def plot_interactive_clusters(X, y_pred, centroids, filename='../results/plots/interactive_clusters.html'):
     df = pd.DataFrame(X, columns=['PC1', 'PC2'])
     df['Cluster'] = y_pred
     
     fig = px.scatter(df, x='PC1', y='PC2', color='Cluster', title='K-Means Clustering Results')
     fig.write_html(filename)
+    
     print(f"Interactive plot saved to {filename}")
