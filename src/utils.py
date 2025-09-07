@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.metrics import normalized_mutual_info_score
@@ -21,5 +22,6 @@ def plot_clusters(X, labels, centroids, filename):
     plt.ylabel('Principal Component 2')
     plt.title('K-Means Clustering Results')
     plt.legend(*scatter.legend_elements(), title="Clusters")
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     plt.savefig(filename)
     plt.close()
